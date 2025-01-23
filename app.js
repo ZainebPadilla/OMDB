@@ -1,28 +1,28 @@
 const API_KEY = "12ad33f0"; 
 const API_URL = `https://www.omdbapi.com/?apikey=${API_KEY}`;
-const form = document.getElementById("search-form");
-const input = document.getElementById("search-input");
-const moviesContainer = document.getElementById("movies-container");
+const form = document.getElementById("search-form"); //Formulaire contenant le champ de recherche.
+const input = document.getElementById("search-input"); //Champ de saisie de recherche.
+const moviesContainer = document.getElementById("movies-container"); //Conteneur dans lequel les résultats des films seront affichés.
 
 // Événement lors du submit du formulaire
 form.addEventListener("submit", async (e) => {
   e.preventDefault(); //e.preventDefault() : empêche la page de se recharger (comportement par défaut d’un formulaire HTML)
-  const query = input.value.trim();
+  const query = input.value.trim(); //On récupère et supprime les espaces de la saisie dans le champ de recherche.
   if (!query) return;
 
   // Efface les résultats précédents
   moviesContainer.innerHTML = "";
 
-  // Récupération des films depuis l'API
-  const movies = await fetchMovies(query);
-  displayMovies(movies);
+  // Récupération des films depuis l'API (fonctions ecrites en ligne 21 et 34)
+  const movies = await fetchMovies(query); //On appelle la fonction fetchMovies pour récupérer les films correspondant à la recherche.
+  displayMovies(movies); //Les films récupérés sont passés à la fonction displayMovies pour être affichés
 });
 
 // Fonction pour récupérer les films
-async function fetchMovies(query) {
+async function fetchMovies(query) { // interroge l'API OMDB avec le paramètre de recherche s
   try {
     const response = await fetch(`${API_URL}&s=${query}`);
-    const data = await response.json();
+    const data = await response.json(); //transforme la réponse en JSON
     return data.Search || [];
   } catch (error) {
     console.error("Erreur lors de la récupération des films :", error);
@@ -37,7 +37,7 @@ function displayMovies(movies) {
     return;
   }
 
-  movies.forEach((movie) => {
+  movies.forEach((movie) => { //parcourt liste films. Pour chaque film, on crée un élément div contenant les classes CSS de mise en page
     const movieCard = document.createElement("div");
     movieCard.classList.add("col-md-4", "d-flex");
 
@@ -51,61 +51,11 @@ function displayMovies(movies) {
         </div>
       </div>
     `;
-    moviesContainer.appendChild(movieCard);
+    moviesContainer.appendChild(movieCard); //On ajoute chaque carte au conteneur principal
   });
 
-  // Ajouter les événements sur les boutons "Read More"
-  document.querySelectorAll(".read-more-btn").forEach((button) => {
-    button.addEventListener("click", () => {
-      const movieId = button.getAttribute("data-id");
-      fetchMovieDetails(movieId);
-    });
-  });
+ 
 }
 
-// Fonction pour récupérer les détails d'un film
-async function fetchMovieDetails(id) {
-  try {
-    const response = await fetch(`${API_URL}&i=${id}`);
-    const movie = await response.json();
-    showMovieModal(movie);
-  } catch (error) {
-    console.error("Erreur lors de la récupération des détails du film :", error);
-  }
-}
 
-// Fonction pour afficher la popup avec les détails du film
-function showMovieModal(movie) {
-  const modalHtml = `
-    <div class="modal fade" id="movieModal" tabindex="-1" aria-labelledby="movieModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="movieModalLabel">${movie.Title}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <img src="${movie.Poster !== "N/A" ? movie.Poster : 'https://via.placeholder.com/300'}" class="img-fluid mb-3" alt="${movie.Title}">
-            <p><strong>Année :</strong> ${movie.Year}</p>
-            <p><strong>Genre :</strong> ${movie.Genre}</p>
-            <p><strong>Synopsis :</strong> ${movie.Plot}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
 
-  // Ajoute la modal au DOM
-  const modalContainer = document.createElement("div");
-  modalContainer.innerHTML = modalHtml;
-  document.body.appendChild(modalContainer);
-
-  // Affiche la modal
-  const modal = new bootstrap.Modal(modalContainer.querySelector("#movieModal"));
-  modal.show();
-
-  // Nettoie le DOM après fermeture
-  modalContainer.querySelector("#movieModal").addEventListener("hidden.bs.modal", () => {
-    modalContainer.remove();
-  });
-}
