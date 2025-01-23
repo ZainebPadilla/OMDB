@@ -6,7 +6,7 @@ const moviesContainer = document.getElementById("movies-container");
 
 // Événement lors du submit du formulaire
 form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+  e.preventDefault(); //e.preventDefault() : empêche la page de se recharger (comportement par défaut d’un formulaire HTML)
   const query = input.value.trim();
   if (!query) return;
 
